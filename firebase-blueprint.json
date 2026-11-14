@@ -1,0 +1,491 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Non-PII application user account, role state, and account status.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "displayName": { "type": "string", "minLength": 2, "maxLength": 120 },
+        "role": { "type": "string", "enum": ["super_admin", "sub_admin", "member", "pending"] },
+        "status": { "type": "string", "enum": ["active", "suspended"] },
+        "fullAccess": { "type": "boolean" },
+        "permissions": { "type": "array", "description": "Granular permission keys (max 15)" },
+        "memberId": { "type": "string", "maxLength": 64 },
+        "emailVerified": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "displayName", "role", "status", "createdAt", "updatedAt"]
+    },
+    "UserPrivate": {
+      "title": "UserPrivate",
+      "description": "Isolated PII for registered users (email, phone, address).",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "email": { "type": "string", "format": "email", "maxLength": 200 },
+        "phone": { "type": "string", "maxLength": 30 },
+        "address": { "type": "string", "maxLength": 300 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "createdAt", "updatedAt"]
+    },
+    "AdminRecord": {
+      "title": "AdminRecord",
+      "description": "Trusted RBAC admin & sub-admin permission document.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "displayName": { "type": "string", "maxLength": 120 },
+        "role": { "type": "string", "enum": ["super_admin", "sub_admin"] },
+        "status": { "type": "string", "enum": ["active", "suspended"] },
+        "fullAccess": { "type": "boolean" },
+        "permissions": { "type": "array" },
+        "grantedBy": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "role", "status", "fullAccess", "permissions", "grantedBy", "createdAt", "updatedAt"]
+    },
+    "WebsiteSettings": {
+      "title": "WebsiteSettings",
+      "description": "Global CMS content, branding, SEO, PWA, and visual theme settings.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 64 },
+        "orgNameBn": { "type": "string", "maxLength": 200 },
+        "orgNameEn": { "type": "string", "maxLength": 200 },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "updatedAt"]
+    },
+    "CmsPage": {
+      "title": "CmsPage",
+      "description": "Dynamic public website page definition.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "slug": { "type": "string", "maxLength": 128 },
+        "titleBn": { "type": "string", "maxLength": 200 },
+        "titleEn": { "type": "string", "maxLength": 200 },
+        "descriptionBn": { "type": "string", "maxLength": 1000 },
+        "isPublished": { "type": "boolean" },
+        "order": { "type": "number" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "slug", "titleBn", "isPublished", "order", "updatedAt"]
+    },
+    "PageSection": {
+      "title": "PageSection",
+      "description": "Safe predefined component block inside a dynamic CMS page.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "pageSlug": { "type": "string", "maxLength": 128 },
+        "type": { "type": "string", "enum": ["hero", "richtext", "image", "banner", "cta", "notice_board", "gallery", "stats", "cards"] },
+        "titleBn": { "type": "string", "maxLength": 300 },
+        "bodyHtml": { "type": "string", "maxLength": 20000 },
+        "imageUrl": { "type": "string", "maxLength": 350000 },
+        "buttonTextBn": { "type": "string", "maxLength": 100 },
+        "buttonLink": { "type": "string", "maxLength": 500 },
+        "order": { "type": "number" },
+        "visible": { "type": "boolean" },
+        "status": { "type": "string", "enum": ["published", "draft"] },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "pageSlug", "type", "order", "visible", "status", "updatedAt"]
+    },
+    "NavMenu": {
+      "title": "NavMenu",
+      "description": "Dynamic navigation menu and dropdown item.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "labelBn": { "type": "string", "maxLength": 100 },
+        "labelEn": { "type": "string", "maxLength": 100 },
+        "targetSlug": { "type": "string", "maxLength": 128 },
+        "parentId": { "type": "string", "maxLength": 128 },
+        "order": { "type": "number" },
+        "visible": { "type": "boolean" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "labelBn", "targetSlug", "order", "visible", "updatedAt"]
+    },
+    "Notice": {
+      "title": "Notice",
+      "description": "Organization official notices and announcements.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "titleBn": { "type": "string", "maxLength": 300 },
+        "bodyBn": { "type": "string", "maxLength": 10000 },
+        "category": { "type": "string", "maxLength": 64 },
+        "isPinned": { "type": "boolean" },
+        "isPublished": { "type": "boolean" },
+        "publishDate": { "type": "string", "maxLength": 30 },
+        "createdBy": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "titleBn", "bodyBn", "isPublished", "publishDate", "createdBy", "createdAt", "updatedAt"]
+    },
+    "NewsItem": {
+      "title": "NewsItem",
+      "description": "Organization news, activities, and achievements.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "type": { "type": "string", "enum": ["news", "activity", "achievement"] },
+        "titleBn": { "type": "string", "maxLength": 300 },
+        "summaryBn": { "type": "string", "maxLength": 600 },
+        "bodyBn": { "type": "string", "maxLength": 15000 },
+        "imageUrl": { "type": "string", "maxLength": 350000 },
+        "publishDate": { "type": "string", "maxLength": 30 },
+        "isPublished": { "type": "boolean" },
+        "createdBy": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "type", "titleBn", "bodyBn", "isPublished", "publishDate", "createdBy", "createdAt", "updatedAt"]
+    },
+    "GalleryItem": {
+      "title": "GalleryItem",
+      "description": "Photo and video gallery items.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "mediaType": { "type": "string", "enum": ["image", "video"] },
+        "titleBn": { "type": "string", "maxLength": 200 },
+        "album": { "type": "string", "maxLength": 100 },
+        "url": { "type": "string", "maxLength": 350000 },
+        "isPublished": { "type": "boolean" },
+        "createdBy": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "mediaType", "titleBn", "url", "isPublished", "createdBy", "createdAt"]
+    },
+    "Member": {
+      "title": "Member",
+      "description": "Public-safe member and executive committee profile.",
+      "type": "object",
+      "properties": {
+        "memberId": { "type": "string", "maxLength": 64, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "displayCode": { "type": "string", "maxLength": 32 },
+        "nameBn": { "type": "string", "maxLength": 120 },
+        "designationBn": { "type": "string", "maxLength": 120 },
+        "committeeType": { "type": "string", "enum": ["executive", "general", "advisory"] },
+        "committeeOrder": { "type": "number" },
+        "photoUrl": { "type": "string", "maxLength": 350000 },
+        "monthlyFeePoisha": { "type": "number" },
+        "status": { "type": "string", "enum": ["active", "inactive"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["memberId", "displayCode", "nameBn", "committeeType", "monthlyFeePoisha", "status", "createdAt", "updatedAt"]
+    },
+    "MemberPrivate": {
+      "title": "MemberPrivate",
+      "description": "Private member contact PII restricted to admins.",
+      "type": "object",
+      "properties": {
+        "memberId": { "type": "string", "maxLength": 64, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "phone": { "type": "string", "maxLength": 30 },
+        "email": { "type": "string", "maxLength": 200 },
+        "address": { "type": "string", "maxLength": 300 },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["memberId", "updatedAt"]
+    },
+    "Account": {
+      "title": "Account",
+      "description": "Financial cash/bank/mobile-banking account with integer poisha balance.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 64, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "nameBn": { "type": "string", "maxLength": 120 },
+        "type": { "type": "string", "enum": ["cash", "bank", "bkash", "nagad", "other"] },
+        "openingBalancePoisha": { "type": "number" },
+        "currentBalancePoisha": { "type": "number" },
+        "isActive": { "type": "boolean" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "nameBn", "type", "openingBalancePoisha", "currentBalancePoisha", "isActive", "updatedAt"]
+    },
+    "Fund": {
+      "title": "Fund",
+      "description": "Dedicated welfare fund with integer poisha balance.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 64, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "nameBn": { "type": "string", "maxLength": 120 },
+        "balancePoisha": { "type": "number" },
+        "isActive": { "type": "boolean" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "nameBn", "balancePoisha", "isActive", "updatedAt"]
+    },
+    "IncomeEntry": {
+      "title": "IncomeEntry",
+      "description": "Income transaction with atomic receipt serial and integer poisha amount.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "receiptNumber": { "type": "string", "maxLength": 40 },
+        "verificationCode": { "type": "string", "maxLength": 32 },
+        "donorName": { "type": "string", "maxLength": 160 },
+        "memberId": { "type": "string", "maxLength": 64 },
+        "category": { "type": "string", "maxLength": 80 },
+        "date": { "type": "string", "maxLength": 20 },
+        "amountPoisha": { "type": "number" },
+        "paymentMethod": { "type": "string", "maxLength": 40 },
+        "accountId": { "type": "string", "maxLength": 64 },
+        "fundId": { "type": "string", "maxLength": 64 },
+        "status": { "type": "string", "enum": ["active", "corrected", "voided"] },
+        "createdBy": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "receiptNumber", "verificationCode", "donorName", "category", "date", "amountPoisha", "accountId", "fundId", "status", "createdBy", "createdAt", "updatedAt"]
+    },
+    "ExpenseEntry": {
+      "title": "ExpenseEntry",
+      "description": "Multi-item expense voucher with approval state and integer poisha total.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "voucherNumber": { "type": "string", "maxLength": 40 },
+        "verificationCode": { "type": "string", "maxLength": 32 },
+        "titleBn": { "type": "string", "maxLength": 200 },
+        "category": { "type": "string", "maxLength": 80 },
+        "date": { "type": "string", "maxLength": 20 },
+        "items": { "type": "array" },
+        "totalAmountPoisha": { "type": "number" },
+        "accountId": { "type": "string", "maxLength": 64 },
+        "fundId": { "type": "string", "maxLength": 64 },
+        "approvalStatus": { "type": "string", "enum": ["pending", "approved", "rejected", "cancelled"] },
+        "status": { "type": "string", "enum": ["active", "corrected", "voided"] },
+        "createdBy": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "voucherNumber", "verificationCode", "titleBn", "category", "date", "items", "totalAmountPoisha", "accountId", "fundId", "approvalStatus", "status", "createdBy", "createdAt", "updatedAt"]
+    },
+    "FundTransfer": {
+      "title": "FundTransfer",
+      "description": "Internal transfer between accounts (not counted as income or expense).",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "fromAccountId": { "type": "string", "maxLength": 64 },
+        "toAccountId": { "type": "string", "maxLength": 64 },
+        "amountPoisha": { "type": "number" },
+        "date": { "type": "string", "maxLength": 20 },
+        "createdBy": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "fromAccountId", "toAccountId", "amountPoisha", "date", "createdBy", "createdAt"]
+    },
+    "SubscriptionPayment": {
+      "title": "SubscriptionPayment",
+      "description": "Member monthly subscription tracking record.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "memberId": { "type": "string", "maxLength": 64 },
+        "year": { "type": "number" },
+        "month": { "type": "number" },
+        "duePoisha": { "type": "number" },
+        "paidPoisha": { "type": "number" },
+        "status": { "type": "string", "enum": ["paid", "partial", "unpaid"] },
+        "createdBy": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "memberId", "year", "month", "duePoisha", "paidPoisha", "status", "createdBy", "createdAt", "updatedAt"]
+    },
+    "ReceiptCounter": {
+      "title": "ReceiptCounter",
+      "description": "Atomic yearly counter for REC-YYYY-NNN and VOU-YYYY-NNN.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 32 },
+        "year": { "type": "number" },
+        "type": { "type": "string", "enum": ["REC", "VOU"] },
+        "lastSeq": { "type": "number" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "year", "type", "lastSeq", "updatedAt"]
+    },
+    "DashboardSummary": {
+      "title": "DashboardSummary",
+      "description": "Aggregated financial summary (public non-PII totals & admin totals).",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 32 },
+        "totalIncomePoisha": { "type": "number" },
+        "totalExpensePoisha": { "type": "number" },
+        "totalBalancePoisha": { "type": "number" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "totalIncomePoisha", "totalExpensePoisha", "totalBalancePoisha", "updatedAt"]
+    },
+    "AuditLog": {
+      "title": "AuditLog",
+      "description": "Immutable append-only audit log for RBAC and financial changes.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "actorUid": { "type": "string", "maxLength": 128 },
+        "actorName": { "type": "string", "maxLength": 120 },
+        "action": { "type": "string", "maxLength": 120 },
+        "module": { "type": "string", "maxLength": 64 },
+        "targetId": { "type": "string", "maxLength": 128 },
+        "details": { "type": "string", "maxLength": 2000 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "actorUid", "actorName", "action", "module", "targetId", "createdAt"]
+    },
+    "ContactMessage": {
+      "title": "ContactMessage",
+      "description": "Public inquiry message submitted via Contact page.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "name": { "type": "string", "minLength": 2, "maxLength": 120 },
+        "phone": { "type": "string", "maxLength": 30 },
+        "email": { "type": "string", "maxLength": 200 },
+        "subject": { "type": "string", "maxLength": 200 },
+        "message": { "type": "string", "minLength": 5, "maxLength": 3000 },
+        "isRead": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "name", "message", "isRead", "createdAt"]
+    },
+    "FinancialYear": {
+      "title": "FinancialYear",
+      "description": "Financial year opening and closing balances.",
+      "type": "object",
+      "properties": {
+        "year": { "type": "number" },
+        "openingBalancePoisha": { "type": "number" },
+        "closingBalancePoisha": { "type": "number" },
+        "isClosed": { "type": "boolean" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["year", "openingBalancePoisha", "isClosed", "updatedAt"]
+    },
+    "BackupLog": {
+      "title": "BackupLog",
+      "description": "Verified backup export log.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "createdBy": { "type": "string", "maxLength": 128 },
+        "recordCount": { "type": "number" },
+        "checksum": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "createdBy", "recordCount", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User non-PII profile and role state"
+    },
+    "/userPrivate/{userId}": {
+      "schema": { "$ref": "#/entities/UserPrivate" },
+      "description": "Isolated user PII (email, phone, address)"
+    },
+    "/admins/{userId}": {
+      "schema": { "$ref": "#/entities/AdminRecord" },
+      "description": "Trusted admin and sub-admin permissions registry"
+    },
+    "/websiteSettings/{settingId}": {
+      "schema": { "$ref": "#/entities/WebsiteSettings" },
+      "description": "Global CMS content, theme, SEO, and PWA settings"
+    },
+    "/pages/{pageId}": {
+      "schema": { "$ref": "#/entities/CmsPage" },
+      "description": "Dynamic public website pages"
+    },
+    "/pageSections/{sectionId}": {
+      "schema": { "$ref": "#/entities/PageSection" },
+      "description": "Visual Website Builder page sections"
+    },
+    "/menus/{menuId}": {
+      "schema": { "$ref": "#/entities/NavMenu" },
+      "description": "Dynamic navigation menu items"
+    },
+    "/notices/{noticeId}": {
+      "schema": { "$ref": "#/entities/Notice" },
+      "description": "Official notices and announcements"
+    },
+    "/news/{newsId}": {
+      "schema": { "$ref": "#/entities/NewsItem" },
+      "description": "News, activities, and achievements"
+    },
+    "/galleries/{itemId}": {
+      "schema": { "$ref": "#/entities/GalleryItem" },
+      "description": "Photo and video gallery items"
+    },
+    "/members/{memberId}": {
+      "schema": { "$ref": "#/entities/Member" },
+      "description": "Public-safe member and committee directory"
+    },
+    "/memberPrivate/{memberId}": {
+      "schema": { "$ref": "#/entities/MemberPrivate" },
+      "description": "Private member contact PII"
+    },
+    "/accounts/{accountId}": {
+      "schema": { "$ref": "#/entities/Account" },
+      "description": "Financial cash/bank/mobile accounts"
+    },
+    "/funds/{fundId}": {
+      "schema": { "$ref": "#/entities/Fund" },
+      "description": "Dedicated welfare funds"
+    },
+    "/income/{incomeId}": {
+      "schema": { "$ref": "#/entities/IncomeEntry" },
+      "description": "Income records with receipt numbers"
+    },
+    "/expenses/{expenseId}": {
+      "schema": { "$ref": "#/entities/ExpenseEntry" },
+      "description": "Multi-item expense vouchers with approval workflow"
+    },
+    "/fundTransfers/{transferId}": {
+      "schema": { "$ref": "#/entities/FundTransfer" },
+      "description": "Internal account-to-account transfers"
+    },
+    "/subscriptionPayments/{paymentId}": {
+      "schema": { "$ref": "#/entities/SubscriptionPayment" },
+      "description": "Member monthly subscription records"
+    },
+    "/receiptCounters/{counterId}": {
+      "schema": { "$ref": "#/entities/ReceiptCounter" },
+      "description": "Atomic serial counters for receipts and vouchers"
+    },
+    "/dashboardSummaries/{summaryId}": {
+      "schema": { "$ref": "#/entities/DashboardSummary" },
+      "description": "Aggregated financial summary"
+    },
+    "/auditLogs/{logId}": {
+      "schema": { "$ref": "#/entities/AuditLog" },
+      "description": "Immutable append-only audit trail"
+    },
+    "/contactMessages/{msgId}": {
+      "schema": { "$ref": "#/entities/ContactMessage" },
+      "description": "Public contact form submissions"
+    },
+    "/financialYears/{yearId}": {
+      "schema": { "$ref": "#/entities/FinancialYear" },
+      "description": "Financial year opening and closing balances"
+    },
+    "/backupLogs/{logId}": {
+      "schema": { "$ref": "#/entities/BackupLog" },
+      "description": "Verified backup logs"
+    }
+  }
+}
